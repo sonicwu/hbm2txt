@@ -99,7 +99,7 @@ def find_in_dir(target_dir, output_file):
 
 if __name__ == '__main__':
     if len(sys.argv) < 3 or sys.argv[1] == '--help':
-        print 'usage: /usr/bin/python <target directory> <output file>'
+        print 'usage: /usr/bin/python hbm2txt.py <target directory> <output file>'
         sys.exit(0)
 
     target_dir = sys.argv[1]
