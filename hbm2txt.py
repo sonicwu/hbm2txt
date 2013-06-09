@@ -35,7 +35,8 @@ class Table:
             for property_node in class_node.getElementsByTagName('property'):
                 column_name = self.get_column_name(property_node)
                 column_type = self.get_column_type(property_node)
-                self.columns.append(Column(column_name, Column.IS_NOT_PK, column_type))
+                column_comment = self.get_column_comment(property_node)
+                self.columns.append(Column(column_name, Column.IS_NOT_PK, column_type, column_comment))
             
             self.is_ready = True
         except:
@@ -93,24 +94,34 @@ class Table:
 
         return column_type
 
+    def get_column_comment(self, target_node):
+        comment_nodes = target_node.getElementsByTagName('comment')
+        if comment_nodes != None and len(comment_nodes) > 0:
+            for text_node in comment_nodes[0].childNodes:
+                if text_node.nodeType == Node.TEXT_NODE:
+                    return text_node.data
+
+        return ''
+
     def __str__(self):
         if self.is_ready == False:
             return ''
 
         str_list = []
-        str_list.append('<table>')
+        str_list.append('<table border="1">')
         str_list.append('<tr><th colspan="4">{0}</th></tr>'.format(self.name.upper()))
         str_list.append('<tr><th>Name</th><th>Is PK</th><th>Type</th><th>Description</th></tr>')
 
         for col in self.columns:
             column_str = '<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>'\
-                .format(col.name, col.is_pk, col.type_str, col.description)
+                .format(col.name, 'PK' if col.is_pk else '', col.type_str, col.description.encode('UTF-8'))
 
             str_list.append(column_str)
 
         str_list.append('</table>')
+        str_list.append('<br/>')
 
-        return '\n\n'.join(str_list)
+        return '\n'.join(str_list)
 
 class Column:
     IS_PK = True
@@ -139,7 +150,10 @@ def find_in_dir(target_dir, output_file):
                     lines.append('\n')
 
     f = open(output_file, 'w')
+    f.write('<html>')
+    f.write('<meta charset="UTF-8">')
     f.writelines(lines)
+    f.write('</html>')
     f.flush()
     f.close()   
 
